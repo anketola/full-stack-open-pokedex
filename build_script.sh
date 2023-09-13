@@ -3,5 +3,7 @@
 echo "Build script"
 
 npm install
+
 npm run build
-npm run start prod
+
+echo "Script finished"
