@@ -8,13 +8,13 @@ on:
     branches: [master]
     types: [opened, synchronize]
 env:
-  GITHUB_MESSAGES: ${{ toJson(join(github.event.commits.*.message)) }}
+  COMMIT_MESSAGES: ${{ toJson(join(github.event.commits.*.message)) }}
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-20.04
     steps:
       - name: Skip contents
-        run: echo "$GITHUB_MESSAGES"
+        run: echo "$COMMIT_MESSAGES"
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -38,7 +38,7 @@ jobs:
     if: ${{ github.event_name == 'push' && !contains($COMMIT_MESSAGES, '#skip') }}
     steps:
       - name: Skip contents
-        run: echo "$GITHUB_MESSAGES"
+        run: echo "$COMMIT_MESSAGES"
       - name: Trigger deployment
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
   tag_release:
