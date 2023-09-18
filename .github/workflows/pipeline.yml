@@ -7,8 +7,8 @@ on:
   pull_request:
     branches: [master]
     types: [opened, synchronize]
-env:
-  COMMIT_MESSAGES: ${{ toJson(join(github.event.commits.*.message)) }}
+
+
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-20.04
@@ -35,7 +35,7 @@ jobs:
     name: Deploy to Render
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && !contains($COMMIT_MESSAGES, '#skip') }}
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') }}
     steps:
       - name: Skip contents
         run: echo "$COMMIT_MESSAGES"
@@ -47,7 +47,7 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-20.04
-    if: ${{ github.event_name == 'push' && !contains($COMMIT_MESSAGES, '#skip') }}
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') }}
     steps:
       - uses: actions/checkout@v3
       - name: Bump version and push tag
