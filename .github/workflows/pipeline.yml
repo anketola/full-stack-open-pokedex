@@ -7,7 +7,8 @@ on:
   pull_request:
     branches: [master]
     types: [opened, synchronize]
-
+env:
+  GITHUB_MESSAGES: ${{ toJson(join(github.event.commits.*.message)) }}
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-20.04
@@ -45,11 +46,8 @@ jobs:
     if: ${{ github.event_name == 'push' }}
     steps:
       - uses: actions/checkout@v3
-      - name: github context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(join(github.event.commits.*.message)) }}
       - name: Bump version and push tag
-        if: ${{ !contains($COMMIT_MESSAGES, '#skip') }}
+        if: ${{ !contains(env.COMMIT_MESSAGES, '#skip') }}
         uses: anothrNick/github-tag-action@1.67.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
