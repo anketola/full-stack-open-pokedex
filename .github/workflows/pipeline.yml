@@ -33,7 +33,7 @@ jobs:
     name: Deploy to Render
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && !contains(env.COMMIT_MESSAGES, '#skip') }}
     steps:
       - name: Trigger deployment
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
@@ -43,11 +43,10 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-20.04
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && !contains(env.COMMIT_MESSAGES, '#skip') }}
     steps:
       - uses: actions/checkout@v3
       - name: Bump version and push tag
-        if: ${{ !contains(env.COMMIT_MESSAGES, '#skip') }}
         uses: anothrNick/github-tag-action@1.67.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
