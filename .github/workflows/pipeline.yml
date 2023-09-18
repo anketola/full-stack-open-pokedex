@@ -28,12 +28,22 @@ jobs:
           command: npm run test:e2e
           start: npm run start-prod
           wait-on: http://localhost:5000
-
   deploy_to_render:
     name: Deploy to Render
-    needs: simple_deployment_pipeline
+    needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' }}
     steps:
       - name: Trigger deployment
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+  tag_release:
+    name: Tag release
+    needs: [simple_deployment_pipeline]
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'push' }}
+    steps:
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.67.0
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DEFAULT_BUMP: patch
